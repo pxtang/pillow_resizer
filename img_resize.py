@@ -6,21 +6,36 @@ def check_quit(string):
   if (string.lower() == "quit"):
     sys.exit()
 
-# resize image. resize_dims should be a tuple or list of dimensions
+def print_batch_done():
+  print "Batch operation complete. Quitting."
+
+# does resizing work based on dims. resize_dims should be a 2-tuple or list of dimensions
+def resize_save(f_name,resize_dims):
+  im = Image.open(f_name)
+  new_im = im.resize(resize_dims,Image.ANTIALIAS)
+  name, ext = f_name.split(".")
+  new_name = name + "_resized." + ext
+  try:
+    new_im.save(new_name)
+  except IOError:
+    print "Something bad happened... attempting to delete newly made %s" % new_name
+    os.remove(new_name)
+    print "Attempt done. Quitting."
+    sys.exit()
+  print "Success! %s created with resolution %d by %d!" % (new_name, resize_dims[0], resize_dims[1])
+
+
+
+# resize image. resize_dims should be a 2-tuple or list of dimensions
 def resize_fixed(f_name,resize_dims):
   if (f_name[0] != "*"):
-    im = Image.open(f_name)
-    new_im = im.resize(resize_dims,Image.ANTIALIAS)
-    name, ext = f_name.split(".")
-    new_name = name + "_resized." + ext
-    try:
-      new_im.save(new_name)
-    except IOError:
-      print "Something bad happened... attempting to delete newly made %s" % new_name
-      os.remove(new_name)
-      print "Attempt done. Quitting."
-      sys.exit()
-    print "Success! %s created with resolution %d by %d!" % (new_name, resize_dims[0], resize_dims[1])
+    resize_save(f_name,resize_dims)
+    sys.exit()
+  else:
+    print "Resizing all images matching %s" % f_name
+    for infile in glob.glob(f_name):
+      resize_save(infile,resize_dims)
+    print_batch_done()
     sys.exit()
 
 
