@@ -19,7 +19,10 @@ def resize_save(f_name,resize_dims):
     new_im.save(new_name)
   except IOError:
     print "Something bad happened... attempting to delete newly made %s" % new_name
-    os.remove(new_name)
+    try:
+      os.remove(new_name)
+    except OSError:
+      print "File %s could not deleted - please check if it exists and delete manually if so." % new_name
     print "Attempt done. Quitting."
     sys.exit()
   print "Success! %s created with resolution %d by %d!" % (new_name, resize_dims[0], resize_dims[1])
@@ -36,13 +39,45 @@ def resize_fixed(f_name,resize_dims):
     print_batch_done()
     sys.exit()
 
+# get long edge and calculate scale for entire picture. 
+# takes in int and tuple, returns float
+def get_long_scale(resize_dim, im_size):
+  long_edge = max(im_size)
+  return float(resize_dim)/long_edge
+
 # resize image to long edge length. resize_dim should be an int
 def resize_long(f_name,resize_dim):
-  pass
+  if (f_name[0] != "*"):
+    im = Image.open(f_name)
+    scale = get_long_scale(resize_dim,im.size)
+    resize_dims = (int(im.size[0] * scale), int(im.size[1] * scale))
+    resize_save(f_name,resize_dims)
+    sys.exit()
+  else:
+    print "Resizing all images matching %s" % f_name
+    for infile in glob.glob(f_name):
+      im = Image.open(infile)
+      scale = get_long_scale(resize_dim,im.size)
+      resize_dims = ( int(im.size[0] * scale), int(im.size[1] * scale))
+      resize_save(infile,resize_dims)
+    print_batch_done()
+    sys.exit()
 
 # resize image by a certain percent. scale should be a float > 0
 def resize_scale(f_name,scale):
-  pass
+  if (f_name[0] != "*"):
+    im = Image.open(f_name)
+    resize_dims = (int(im.size[0] * scale), int(im.size[1] * scale))
+    resize_save(f_name,resize_dims)
+    sys.exit()
+  else:
+    print "Resizing all images matching %s" % f_name
+    for infile in glob.glob(f_name):
+      im = Image.open(infile)
+      resize_dims = ( int(im.size[0] * scale), int(im.size[1] * scale))
+      resize_save(infile,resize_dims)
+    print_batch_done()
+    sys.exit()
 
 resize_formats = ("F","L","%")
 
@@ -85,8 +120,20 @@ if (resize[-1] == resize_formats[0]):
     sys.exit()
   resize_fixed(f_name, resize_dims)
 elif (resize[-1] == resize_formats[1]):
-  # resize_long()
-  pass
+  try:
+    resize_dim = int(resize[:-1])
+  except ValueError:
+    print "Bad resize dimension - quitting. Please try again."
+    sys.exit()
+  resize_long(f_name,resize_dim)
 elif (resize[-1] == resize_formats[2]):
-  # resize_scale()
-  pass
+  try:
+    scale = float(resize[0:-1])/100
+  except ValueError:
+    print "Bad scaling dimensions - quitting. Please try again."
+    sys.exit()
+  if scale <= 0:
+    print "Cannot scale by negative amount - quitting. Please try again."
+    sys.exit()
+  resize_scale(f_name,scale)
+  
