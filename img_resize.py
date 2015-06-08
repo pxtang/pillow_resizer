@@ -24,9 +24,7 @@ def resize_save(f_name,resize_dims):
     sys.exit()
   print "Success! %s created with resolution %d by %d!" % (new_name, resize_dims[0], resize_dims[1])
 
-
-
-# resize image. resize_dims should be a 2-tuple or list of dimensions
+# resize image to fixed dimensions. resize_dims should be a 2-tuple or list of dimensions
 def resize_fixed(f_name,resize_dims):
   if (f_name[0] != "*"):
     resize_save(f_name,resize_dims)
@@ -38,6 +36,13 @@ def resize_fixed(f_name,resize_dims):
     print_batch_done()
     sys.exit()
 
+# resize image to long edge length. resize_dim should be an int
+def resize_long(f_name,resize_dim):
+  pass
+
+# resize image by a certain percent. scale should be a float > 0
+def resize_scale(f_name,scale):
+  pass
 
 resize_formats = ("F","L","%")
 
@@ -79,3 +84,9 @@ if (resize[-1] == resize_formats[0]):
     print "Bad resize dimensions - quitting. Please try again."
     sys.exit()
   resize_fixed(f_name, resize_dims)
+elif (resize[-1] == resize_formats[1]):
+  # resize_long()
+  pass
+elif (resize[-1] == resize_formats[2]):
+  # resize_scale()
+  pass
