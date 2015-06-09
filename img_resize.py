@@ -111,7 +111,7 @@ while (True):
       break
   print "I didn't understand your request - try again?\n"
 
-if (resize[-1] == resize_formats[0]):
+if (resize[-1] == resize_formats[0]): # F
   resize_dims = resize[:-1].split("x")
   try:
     resize_dims = ( int(resize_dims[0]), int(resize_dims[1]) )
@@ -119,14 +119,14 @@ if (resize[-1] == resize_formats[0]):
     print "Bad resize dimensions - quitting. Please try again."
     sys.exit()
   resize_fixed(f_name, resize_dims)
-elif (resize[-1] == resize_formats[1]):
+elif (resize[-1] == resize_formats[1]): # L
   try:
-    resize_dim = int(resize[:-1])
+    resize_dim = float(resize[:-1])
   except ValueError:
     print "Bad resize dimension - quitting. Please try again."
     sys.exit()
   resize_long(f_name,resize_dim)
-elif (resize[-1] == resize_formats[2]):
+elif (resize[-1] == resize_formats[2]): # %
   try:
     scale = float(resize[0:-1])/100
   except ValueError:
